@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المحرر الاحترافي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --bg-color: #f5f6fa;
+            --text-color: #2c3e50;
+            --border-radius: 8px;
+            --padding-mobile: 10px;
+            --padding-desktop: 20px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: var(--padding-mobile);
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .toolbar {
+            background: #fff;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, auto));
+            gap: 5px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .toolbar button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .toolbar button:active {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .toolbar select {
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            background: #fff;
+            min-width: 100px;
+        }
+
+        #editor {
+            background: #fff;
+            min-height: 60vh;
+            max-height: 70vh;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .actions button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .actions button:active {
+            transform: scale(0.98);
+        }
+
+        .status-bar {
+            background: #fff;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        /* تحسينات للشاشات الصغيرة جداً */
+        @media (max-width: 320px) {
+            .toolbar button {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .actions button {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+
+        /* تحسينات للشاشات المتوسطة */
+        @media (min-width: 768px) {
+            body {
+                padding: var(--padding-desktop);
+            }
+
+            .toolbar {
+                grid-template-columns: repeat(auto-fit, minmax(45px, auto));
+            }
+
+            .toolbar button {
+                width: 45px;
+                height: 45px;
+            }
+
+            #editor {
+                min-height: 70vh;
+            }
+        }
+
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1024px) {
+            .header {
+                font-size: 16px;
+            }
+
+            .toolbar button {
+                transition: all 0.3s ease;
+            }
+
+            .toolbar button:hover {
+                background: var(--secondary-color);
+                color: white;
+            }
+
+            .actions button:hover {
+                opacity: 0.9;
+            }
+        }
+
+        /* منع تحديد النص في الأزرار */
+        .toolbar button,
+        .actions button {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* تحسين التمرير */
+        #editor::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #editor::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #editor::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        /* تحسينات لنظام iOS */
+        @supports (-webkit-touch-callout: none) {
+            #editor {
+                -webkit-user-select: text;
+            }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-menu {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .fab-menu.active {
+            display: flex;
+        }
+
+        .fab-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .fab-item:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            background: var(--success-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+        }
+
+        .dark-mode #editor,
+        .dark-mode .toolbar,
+        .dark-mode .status-bar {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .dark-mode .btn {
+            background: #3d3d3d;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-edit"></i> المحرر الاحترافي</h1>
+        </div>
+
+        <div class="toolbar">
+            <button onclick="execCommand('bold')" title="غامق">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button onclick="execCommand('italic')" title="مائل">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button onclick="execCommand('underline')" title="تحته خط">
+                <i class="fas fa-underline"></i>
+            </button>
+            <button onclick="execCommand('justifyRight')" title="محاذاة لليمين">
+                <i class="fas fa-align-right"></i>
+            </button>
+            <button onclick="execCommand('justifyCenter')" title="توسيط">
+                <i class="fas fa-align-center"></i>
+            </button>
+            <button onclick="execCommand('justifyLeft')" title="محاذاة لليسار">
+                <i class="fas fa-align-left"></i>
+            </button>
+            <button onclick="execCommand('insertUnorderedList')" title="قائمة نقطية">
+                <i class="fas fa-list-ul"></i>
+            </button>
+            <button onclick="execCommand('insertOrderedList')" title="قائمة رقمية">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <select onchange="execCommandWithArg('fontSize', this.value)">
+                <option value="3">حجم عادي</option>
+                <option value="1">صغير</option>
+                <option value="5">كبير</option>
+                <option value="7">كبير جداً</option>
+            </select>
+        </div>
+
+        <div id="editor" contenteditable="true"></div>
+
+        <div class="actions">
+            <button onclick="saveToLocalStorage()">
+                <i class="fas fa-save"></i> حفظ
+            </button>
+            <button onclick="loadFromLocalStorage()">
+                <i class="fas fa-folder-open"></i> فتح
+            </button>
+            <button onclick="createNewDocument()">
+                <i class="fas fa-file"></i> جديد
+            </button>
+            <button onclick="window.print()">
+                <i class="fas fa-print"></i> طباعة
+            </button>
+        </div>
+
+        <div class="status-bar">
+            <span id="wordCount">0 كلمة</span>
+            <span id="lastSaved">آخر حفظ: لم يتم الحفظ بعد</span>
+        </div>
+
+        <!-- Floating Action Button -->
+        <div class="fab" onclick="toggleFabMenu()">
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="fab-menu">
+            <div class="fab-item" onclick="createNewDocument()" title="مستند جديد">
+                <i class="fas fa-file"></i>
+            </div>
+            <div class="fab-item" onclick="saveToLocalStorage()" title="حفظ">
+                <i class="fas fa-save"></i>
+            </div>
+            <div class="fab-item" onclick="exportAsPDF()" title="PDF تصدير">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDarkMode = false;
+        let autoSaveInterval;
+
+        function execCommand(command) {
+            document.execCommand(command, false, null);
+            updateWordCount();
+        }
+
+        function execCommandWithArg(command, arg) {
+            document.execCommand(command, false, arg);
+            updateWordCount();
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('editor').innerText;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            document.getElementById('wordCount').innerText = `${words.length} كلمة`;
+        }
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('editorContent', document.getElementById('editor').innerHTML);
+                updateLastSaved();
+                alert('تم الحفظ بنجاح!');
+            } catch (e) {
+                alert('حدث خطأ أثناء الحفظ');
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const content = localStorage.getItem('editorContent');
+                if (content) {
+                    document.getElementById('editor').innerHTML = content;
+                    updateWordCount();
+                    alert('تم استرجاع المحتوى بنجاح!');
+                }
+            } catch (e) {
+                alert('حدث خطأ أثناء الاسترجاع');
+            }
+        }
+
+        function createNewDocument() {
+            if (confirm('هل أنت متأكد من إنشاء مستند جديد؟')) {
+                document.getElementById('editor').innerHTML = '';
+                updateWordCount();
+            }
+        }
+
+        function updateLastSaved() {
+            const now = new Date();
+            document.getElementById('lastSaved').innerText = 
+                `آخر حفظ: ${now.toLocaleTimeString('ar-EG')}`;
+        }
+
+        function exportAsPDF() {
+            window.print();
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.querySelector('.header-actions .btn i');
+            themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        function toggleFabMenu() {
+            document.querySelector('.fab-menu').classList.toggle('active');
+        }
+
+        window.onload = function() {
+            loadFromLocalStorage();
+            document.getElementById('editor').addEventListener('input', updateWordCount);
+        };
+    </script>
+</body>
+</html>
